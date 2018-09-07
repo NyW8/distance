@@ -1,7 +1,13 @@
 # -*- coding: utf-8 -*-
 
 class Country:
+    """ Country class for information about countries including name, 
+        languages, religions, ethnicities, customs, taboos, currency, 
+        power, timezone, regulations, government type, and photos.
+    """
     def __init__(self, name, lang, lang_amt, relig, relig_amt, eth, eth_amt, customs, taboos, curr_pow_time, regulations, government, photos = []):
+        """ Initialization function, assigns all values to their corresponding input
+        """
         self.name = name
         self.lang = lang
         self.lang_amt = lang_amt
@@ -16,12 +22,14 @@ class Country:
         self.government = government
         self.photos = photos
     def get_info(self):
+        """ Returns all information about itself
+        """
         return ({"name":self.name, "lang":self.lang, "lang_amt":self.lang_amt, "relig":self.relig,
         "relig_amt":self.relig_amt, "eth":self.eth,"eth_amt":self.eth_amt, "customs":self.customs,
         "taboos":self.taboos,"curr_pow_time":self.curr_pow_time,"regulations":self.regulations,
         "government":self.government, "photos":self.photos})
 
-
+#Initialize 6 countries for examples
 israel = Country("Israel", ["Hebrew", "Arabic", "Russian"],[49, 18, 15],
     ["Jewish", "Muslim", "Christian"], [75, 18, 2], ["Jewish", "Arabic", "Other"], [75, 20, 5],
     ["Very religious Jewish people of either gender do not acknowledge members of a different gender while greeting others.","Israelis are very open, so don\'t be afraid to talk about topics like politics-- but expect candor in return."],
@@ -73,6 +81,8 @@ southafrica = Country("South Africa", ["Zulu", "Xhosa", "Afrikaans", "English", 
 
 
 def return_country(name):
+    """ Returns the country's information if it is available
+    """
     if name == "Mexico":
         return mexico
     elif name == "France":
