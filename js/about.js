@@ -22,7 +22,7 @@ function checkBools(){
     console.log("Keep going, try to change all four photos!");
   }
 }
-
+ 
 function imgChange(id) {
   image = document.getElementById(id)
   var png = "../png/"+id+".JPG";
