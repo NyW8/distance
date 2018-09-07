@@ -14,7 +14,6 @@
   opacity: 10;
 }
 
-
 .x{
   text-align:center;
   padding-left:97%;
@@ -33,11 +32,6 @@ body { background-color: #7dcbd4; color: #fff; }
   display:flex;
   justify-content: center;
 }
-
-
-
-
-
 
 h1{
   font-family: 'Actor', sans-serif;
