@@ -23,17 +23,43 @@ class MapPage(webapp2.RequestHandler):
 class Countries(webapp2.RequestHandler):
     """ Handles calls to different countries for more info on them
     """
+	#THIS WAS ADDED:
+    def getPage(self, country_name):
+	
+		url = "https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch="+country_name+"&format=jsonfm"
+		try:
+			result = urlfetch.fetch(url)
+            #Check that site could be reached
+			if result.status_code == 200:
+
+				#Change result.content from string to dictuionary
+				logging.info("Checking info: " + str(result.status_code) +str(result.content))
+				#THIS NEXT LINE IS THE ONE THAT DOESN'T WORK:
+				listDictionary = json.loads(result.content)
+				logging.info("query: ",listDictionary["query"])
+				logging.info("all of search: ",listDictionary["query"]["search"])
+				logging.info("first item in search: ",listDictionary["query"]["search"][0])
+				logging.info("pageid: ",listDictionary["query"]["search"][0]["pageid"])
+				pageid = listDictionary["query"]["search"][0]["pageid"]
+				logging.info("pageid", pageid)
+				
+            
+        #Catch url not found errors
+		except urlfetch.Error:
+			logging.exception("Unable to get values: url is invalid")
+	
     def get(self):
-        #Get template and country's name
-        template = template_env.get_template('html/country.html')
-        country_name = self.request.get("country_name")
-        test = return_country(country_name)
-        
-        #Log info for debugging
-        logging.info(str(test)+" "+str(type(test)))
-        
-        #Render that country's template
-        self.response.write(template.render(test.get_info()))
+		#Get template and country's name
+		template = template_env.get_template('html/country.html')
+		country_name = self.request.get("country_name")
+		self.getPage(country_name);
+		test = return_country(country_name)
+		
+		#Log info for debugging
+		logging.info(str(test)+" "+str(type(test)))
+		
+		#Render that country's template
+		self.response.write(template.render(test.get_info()))
 
 class Currency(webapp2.RequestHandler):
     """ Currency convertion page, uses currency api from apilayer
