@@ -29,6 +29,7 @@ class Country:
         "taboos":self.taboos,"curr_pow_time":self.curr_pow_time,"regulations":self.regulations,
         "government":self.government, "photos":self.photos})
 
+
 #Initialize 6 countries for examples
 israel = Country("Israel", ["Hebrew", "Arabic", "Russian"],[49, 18, 15],
     ["Jewish", "Muslim", "Christian"], [75, 18, 2], ["Jewish", "Arabic", "Other"], [75, 20, 5],
