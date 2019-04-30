@@ -11,6 +11,7 @@ from form import Suggestion
 from bs4 import BeautifulSoup
 import requests
 
+
 #Creating variables for template loading
 template_loader = jinja2.FileSystemLoader(searchpath="./")
 template_env = jinja2.Environment(loader= template_loader)
