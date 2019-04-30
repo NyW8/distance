@@ -116,37 +116,24 @@ class Currency(webapp2.RequestHandler):
 		"""
 		#Our api url
 		url = 'http://apilayer.net/api/list?access_key=26d090d35324a4b7dd821d34068f354d'
+		listDictionary = get_json(url)
 
-		#Try to access the internet to get the currencies
-		try:
-			result = urlfetch.fetch(url)
-
-			#Check that site could be reached
-			if result.status_code == 200:
-
-				#Change result.content from string to dictuionary
-				listDictionary = json.loads(result.content)
-
-				#Returns dictionary of currency ids and names
-				currencies = {}
-				count = 0
-				#countList = []
-				
-				#Returns a sorted dictionary of values and indexes
-				for value in sorted(listDictionary["currencies"].values()):
-					currencies[count] = value
-					count+=1
-				if search == "0":
-					return currencies
-				else:
-					val = currencies[search]
-					val2 = [key for (key, value) in listDictionary["currencies"].items() if value == val][0]
-				#Return values
-				return val2
-			
-		#Catch url not found errors
-		except urlfetch.Error:
-			logging.exception("Unable to get values: url is invalid")
+		#Returns dictionary of currency ids and names
+		currencies = {}
+		count = 0
+		#countList = []
+		
+		#Returns a sorted dictionary of values and indexes
+		for value in sorted(listDictionary["currencies"].values()):
+			currencies[count] = value
+			count+=1
+		if search == "0":
+			return currencies
+		else:
+			val = currencies[search]
+			val2 = [key for (key, value) in listDictionary["currencies"].items() if value == val][0]
+		#Return values
+		return val2
 
 			
 	def getConversion(self):
@@ -154,16 +141,8 @@ class Currency(webapp2.RequestHandler):
 		"""
 		#API url
 		url = "http://www.apilayer.net/api/live?access_key=26d090d35324a4b7dd821d34068f354d"
-
-		try:
-			#If internet is available, load the conversion rates
-			result = urlfetch.fetch(url)
-			if result.status_code == 200:
-				listDictionary = json.loads(result.content)["quotes"]
-				return listDictionary
-		except urlfetch.Error:
-			logging.exception("Unable to find conversion rates: url is invalid")
-
+		listDictionary = get_json(url)
+		return listDictionary
 			
 	def get(self):
 		""" Original currency page, shows the currency template
@@ -188,8 +167,12 @@ class Currency(webapp2.RequestHandler):
 		to1 = self.getNames(int(curr2))
 
 		#Get both conversion factors
-		convert_currencies1 = self.getConversion()["USD"+to1]
-		convert_currencies2 = self.getConversion()["USD"+from1]
+		convert_currencies1 = 1
+		convert_currencies2 = 1
+		if (from1 != to1):
+			convert_currencies1 = self.getConversion()["USD"+to1]
+			convert_currencies2 = self.getConversion()["USD"+from1]
+		
 		amount2 = 0
 		
 		#Check that amount is valid
