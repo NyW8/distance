@@ -8,6 +8,11 @@ import jinja2
 from country import *
 from form import Suggestion
 
+from bs4 import BeautifulSoup
+#from requests.api import request
+import requests
+#from libs.bs4 import BeautifulSoup
+
 #Creating variables for template loading
 template_loader = jinja2.FileSystemLoader(searchpath="./")
 template_env = jinja2.Environment(loader= template_loader)
@@ -36,7 +41,7 @@ class Countries(webapp2.RequestHandler):
 		url = "https://en.wikipedia.org/w/api.php?action=query&list=search&format=json&srsearch=Tourism_in_"+country_name
 		result = get_json(url)
 		pageid = result["query"]["search"][0]["pageid"]
-		logging.info("pageid: "+ str(pageid))
+		logging.info("HIYApageid: "+ str(pageid))
 
 		#Get photos themselves
 		url = "https://en.wikipedia.org/w/api.php?action=parse&format=json&pageid="+str(pageid)
@@ -45,6 +50,10 @@ class Countries(webapp2.RequestHandler):
 		photos = []
 
 		#TODO: FIND THE PHOTOS IN THE HTML AND ADD LINKS TO PHOTOS ARRAY
+		
+		#soupJ = BeautifulSoup(result, 'html.parser')
+		#for img in soupJ.findAll('img'):
+		#	photos.append(img.get('src'))
 
 		return(photos)
 
@@ -53,8 +62,9 @@ class Countries(webapp2.RequestHandler):
 		listDictionary = get_json(url)
 		#Change result.content from string to dictionary
 		#listDictionary = json.loads(result.content)
+		
 		pageid = listDictionary["query"]["search"][0]["pageid"]
-		logging.info("pageid: "+ str( pageid))
+		logging.info("YOYOYOpageid: "+ str( pageid))
 		
 		url = "https://en.wikipedia.org/w/api.php?action=parse&format=json&pageid="+str(pageid)
 		result = get_json(url)
@@ -76,7 +86,11 @@ class Countries(webapp2.RequestHandler):
 		power = ""				#power type
 		government = ""			#type of government
 
-		#soup = BeautifulSoup(json_result["parse"]["text"]["*"][1:-1], "html.parse")
+		soup = BeautifulSoup(json_result["parse"]["text"]["*"][1:-1], "html.parser")
+		#mexico_html = requests.get('https://en.wikipedia.org/wiki/Mexico')
+		#soup = BeautifulSoup(mexico_html,'html.parser')
+		#soup = BeautifulSoup(result['content_html'], 'html.parser')
+		logging.info(soup.title)
 		new_country = Country(name, languages, language_amt, religions, religion_amt, ethnicities, ethnicity_amt,
 			customs, taboos, [currency, power, timezones], regulations, government, photos)
 		logging.info(new_country.get_info())
@@ -86,13 +100,12 @@ class Countries(webapp2.RequestHandler):
 		#Get template and country's name
 		template = template_env.get_template('html/country.html')
 		country_name = self.request.get("country_name")
-		self.getPage(country_name)
-		#test = return_country(country_name)
+		test = return_country(country_name)
 		country = self.getPage(country_name)
-		logging.info("COUNTRY REQUESTED: "+str(country.get_info()["name"]))
+		#logging.info("COUNTRY REQUESTED: "+str(country.get_info()["name"]))
 		
 		#Render that country's template
-		self.response.write(template.render(country.get_info()))
+		self.response.write(template.render(test.get_info()))
 
 class Currency(webapp2.RequestHandler):
 	""" Currency convertion page, uses currency api from apilayer
