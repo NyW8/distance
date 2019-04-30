@@ -9,9 +9,7 @@ from country import *
 from form import Suggestion
 
 from bs4 import BeautifulSoup
-#from requests.api import request
 import requests
-#from libs.bs4 import BeautifulSoup
 
 #Creating variables for template loading
 template_loader = jinja2.FileSystemLoader(searchpath="./")
@@ -41,7 +39,7 @@ class Countries(webapp2.RequestHandler):
 		url = "https://en.wikipedia.org/w/api.php?action=query&list=search&format=json&srsearch=Tourism_in_"+country_name
 		result = get_json(url)
 		pageid = result["query"]["search"][0]["pageid"]
-		logging.info("HIYApageid: "+ str(pageid))
+		logging.info("pageid: "+ str(pageid))
 
 		#Get photos themselves
 		url = "https://en.wikipedia.org/w/api.php?action=parse&format=json&pageid="+str(pageid)
@@ -50,7 +48,7 @@ class Countries(webapp2.RequestHandler):
 		photos = []
 
 		#TODO: FIND THE PHOTOS IN THE HTML AND ADD LINKS TO PHOTOS ARRAY
-		
+		#The code below should return all the photos
 		#soupJ = BeautifulSoup(result, 'html.parser')
 		#for img in soupJ.findAll('img'):
 		#	photos.append(img.get('src'))
@@ -64,7 +62,7 @@ class Countries(webapp2.RequestHandler):
 		#listDictionary = json.loads(result.content)
 		
 		pageid = listDictionary["query"]["search"][0]["pageid"]
-		logging.info("YOYOYOpageid: "+ str( pageid))
+		logging.info("pageid: "+ str( pageid))
 		
 		url = "https://en.wikipedia.org/w/api.php?action=parse&format=json&pageid="+str(pageid)
 		result = get_json(url)
@@ -100,12 +98,12 @@ class Countries(webapp2.RequestHandler):
 		#Get template and country's name
 		template = template_env.get_template('html/country.html')
 		country_name = self.request.get("country_name")
-		test = return_country(country_name)
+		#test = return_country(country_name)
 		country = self.getPage(country_name)
 		#logging.info("COUNTRY REQUESTED: "+str(country.get_info()["name"]))
 		
 		#Render that country's template
-		self.response.write(template.render(test.get_info()))
+		self.response.write(template.render(country.get_info()))
 
 class Currency(webapp2.RequestHandler):
 	""" Currency convertion page, uses currency api from apilayer
