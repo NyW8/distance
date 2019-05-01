@@ -45,18 +45,17 @@ class Countries(webapp2.RequestHandler):
 		#Get photos themselves
 		url = "https://en.wikipedia.org/w/api.php?action=parse&format=json&pageid="+str(pageid)
 		result = get_json(url)
-		html_from_result = result["parse"]["text"]["*"][1:-1]
+		html_from_result = result["parse"]["text"]["*"]
 		photos = []
-
-		#TODO: FIND THE PHOTOS IN THE HTML AND ADD LINKS TO PHOTOS ARRAY
-		#The code below should return all the photos
-		#soupJ = BeautifulSoup(result, 'html.parser')
-		#for img in soupJ.findAll('img'):
-		#	photos.append(img.get('src'))
+		#Add all the photos to the array
+		soupJ = BeautifulSoup(html_from_result, 'html.parser')
+		for img in soupJ.findAll('img', alt=True):
+			if (img['alt'] == "" and not("flag" in img.get('src').lower() or "logo" in img.get('src').lower() or "icon" in img.get('src').lower() ) ):
+				photos.append(img.get('src'))
 
 		return(photos)
 
-	def getPage(self, country_name):	
+	def getPage(self, country_name):
 		url = "https://en.wikipedia.org/w/api.php?action=query&list=search&format=json&srsearch="+country_name
 		listDictionary = get_json(url)
 		#Change result.content from string to dictionary
@@ -69,6 +68,7 @@ class Countries(webapp2.RequestHandler):
 		result = get_json(url)
 		name = result["parse"]["title"]
 		photos = self.getPhotos(name)
+		html_from_result = result["parse"]["text"]["*"]
 
 		#TODO: get all data below from the html page:
 		languages = []			#list of languages most used (or maybe just national languages?)
@@ -85,14 +85,17 @@ class Countries(webapp2.RequestHandler):
 		power = ""				#power type
 		government = ""			#type of government
 
-		soup = BeautifulSoup(json_result["parse"]["text"]["*"][1:-1], "html.parser")
+		soup = BeautifulSoup(html_from_result, "html.parser")
 		#mexico_html = requests.get('https://en.wikipedia.org/wiki/Mexico')
 		#soup = BeautifulSoup(mexico_html,'html.parser')
 		#soup = BeautifulSoup(result['content_html'], 'html.parser')
 		logging.info(soup.title)
 		new_country = Country(name, languages, language_amt, religions, religion_amt, ethnicities, ethnicity_amt,
 			customs, taboos, [currency, power, timezones], regulations, government, photos)
-		logging.info(new_country.get_info())
+		
+		#for photo in photos:
+	#		logging.info(photo)
+		#logging.info(new_country.get_info())
 		return (new_country)
 	
 	def get(self):
