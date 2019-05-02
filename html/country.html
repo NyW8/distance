@@ -4,6 +4,7 @@
 <head>
 
   <meta name="theme-color" content="#5CADA7" />
+  <title>{{name}} - GlobeNotes</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="shortcut icon" type="image/x-icon" href="../png/favicon.ico">
   <link rel="stylesheet" media="screen and (min-device-width: 450px)" href="../css/countryPage/country.css" />
@@ -54,7 +55,7 @@
   <div class="empty"></div>
 
   <div class="info">
-    <p class="bigtext">Ethnic Groups:</p>
+    <p class="bigtext">Ethnic Group(s):</p>
     {% for value in eth %}
     {{value}}<br>
     {% endfor %}
@@ -95,14 +96,14 @@
   <div class="empty"></div>
 
   <div class="info">
-  <p class="bigtext">Time Zone:</p>
+  <p class="bigtext">Time Zone(s):</p>
   {% for value in curr_pow_time[2] %}
   {{value}}<br>
   {% endfor %}
   </div>
 <br>
   <div class="info">
-  <p class="bigtext">Travel Regulations:</p>
+  <p class="bigtext">Travel Regulation(s):</p>
   {% for value in regulations %}
 {{value}}<br>
   {% endfor %}

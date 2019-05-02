@@ -24,6 +24,12 @@ def get_json(url):
 	except urlfetch.Error:
 		logging.exception("Unable to get info from "+str(url))
 
+def match_class(target):
+    def do_match(tag):
+        classes = tag.get('class', [])
+        return all(c in classes for c in target)
+    return do_match
+
 class MapPage(webapp2.RequestHandler):
 	""" Handles the main page (Map page), and renders it
 	"""
@@ -68,34 +74,46 @@ class Countries(webapp2.RequestHandler):
 		result = get_json(url)
 		name = result["parse"]["title"]
 		photos = self.getPhotos(name)
-		html_from_result = result["parse"]["text"]["*"]
 
-		#TODO: get all data below from the html page:
+		soup = BeautifulSoup(result["parse"]["text"]["*"], "html.parser")
+		infobox = soup.find_all(match_class(["infobox", "geography", "vcard"]))[0]
+
+		all_data = {}
+		for row in infobox.find_all("tr"):
+			info = row.find_all("th")
+			data = row.find_all("td")
+			if (len(info) != 0 and len(data) != 0):
+				key = info[0].text.encode("utf-8").strip()
+				value = data[0].text.encode("utf-8").strip()
+				if (key in all_data):
+					all_data[key].append(value)
+				else:
+					all_data[key] = [value]
+				
+
+		logging.info("SOUP ENDS HERE")
 		languages = []			#list of languages most used (or maybe just national languages?)
-		language_amt = []		#percent of languages in same order as language array, e.g. if language is [English, Spanish], and they are 75% and 25% used, language_amt = [75, 25]
 		religions = []
-		religion_amt = []
+		currency = all_data["Currency"][0]
+		government = all_data["Government"][0]			#type of government
+		#TODO: get all data below from the html page:
+		for language in all_data["National language"]:
+			languages.append(language)
+		for religion in all_data["Religion"]:
+			religions.append(religion)
+
+		#TODO: get data for these:
 		ethnicities = []
-		ethnicity_amt = []
+		timezones = []
 		customs = []
 		taboos = []
-		timezones = []
 		regulations = []		#travel regulations
-		currency = ""
 		power = ""				#power type
-		government = ""			#type of government
-
-		soup = BeautifulSoup(html_from_result, "html.parser")
-		#mexico_html = requests.get('https://en.wikipedia.org/wiki/Mexico')
-		#soup = BeautifulSoup(mexico_html,'html.parser')
-		#soup = BeautifulSoup(result['content_html'], 'html.parser')
-		logging.info(soup.title)
-		new_country = Country(name, languages, language_amt, religions, religion_amt, ethnicities, ethnicity_amt,
+		
+		logging.info(all_data)
+		new_country = Country(name, languages,  religions, ethnicities,
 			customs, taboos, [currency, power, timezones], regulations, government, photos)
 		
-		#for photo in photos:
-	#		logging.info(photo)
-		#logging.info(new_country.get_info())
 		return (new_country)
 	
 	def get(self):
