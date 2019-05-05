@@ -7,6 +7,7 @@ import logging
 import jinja2
 from country import *
 from form import Suggestion
+import re
 
 from bs4 import BeautifulSoup
 import requests
@@ -76,6 +77,10 @@ class Countries(webapp2.RequestHandler):
 		photos = self.getPhotos(name)
 
 		soup = BeautifulSoup(result["parse"]["text"]["*"], "html.parser")
+		#logging.info(soup.prettify())
+		#with open("output1.html", "w") as file:
+		#	file.write(unicode(soup))
+    		
 		infobox = soup.find_all(match_class(["infobox", "geography", "vcard"]))[0]
 
 		all_data = {}
@@ -104,6 +109,24 @@ class Countries(webapp2.RequestHandler):
 
 		#TODO: get data for these:
 		ethnicities = []
+		#Find the header with ethnic
+		start = soup.find(id = "Ethnicity_and_race").parent
+		logging.info(start.name)
+		while(start.next_sibling.name!="h3") and (start.next_sibling.name!="h4"):
+			start = start.next_sibling
+			if(start.name == "p"):
+				links = start.find_all('a', href=re.compile("(/wiki/)+([A-Z])+"))
+				for link in links:
+					logging.info(link['title'])
+					if(link['title'] not in ethnicities):
+						ethnicities.append(link['title'])
+		#for div in soup.find_all("div", class_="mw-parser-output"):
+		#extract hyperlinked words to the list up until the next header
+		#There will be a updated list of not_ethnic list 
+		#Remove any of those words from the list of ethnicities
+		#Make it possible for user to remove ethnicities into the not_ethnic list with a admin pw
+		#This list must be constantly updating by ITSELF
+		
 		timezones = []
 		customs = []
 		taboos = []
